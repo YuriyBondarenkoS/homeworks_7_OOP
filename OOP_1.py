@@ -1,36 +1,52 @@
 list_students = [
     {
-        "name": "StudentFour",
-        "surname": "111",
-        "gender": "man",
-        "finished_courses": [],
-        "courses_in_progress": [],
-        "grades": {}
+        'name': 'Yuriy',
+        'surname': 'Bonderenko',
+        'gender': 'your_gender',
+        'finished_courses': ['Введение в программирование'],
+        'courses_in_progress': ['PHP', 'Python', 'JavaScript'],
+        'grades': {'PHP': [8, 9, 7, 10, 8],  'Python': [10, 5, 7, 10, 10], 'JavaScript': [8, 7, 10, 10, 6]}
     },
     {
-        "name": "StudentFour",
-        "surname": "111",
-        "gender": "man",
-        "finished_courses": [],
-        "courses_in_progress": [],
-        "grades": {}
+        'name': 'Vasilii',
+        'surname': 'Kononenko',
+        'gender': 'your_gender',
+        'finished_courses': ['Введение в программирование'],
+        'courses_in_progress': ['PHP', 'Python', 'JavaScript'],
+        'grades': {'PHP': [6, 9, 8, 9, 8],  'Python': [8, 7, 10, 10, 5], 'JavaScript': [7, 8, 10, 10, 8]}
     },
     {
-        "name": "StudentFour",
-        "surname": "111",
-        "gender": "man",
-        "finished_courses": [],
-        "courses_in_progress": [],
-        "grades": {}
+        'name': 'Artem',
+        'surname': 'Poloniankin',
+        'gender': 'your_gender',
+        'finished_courses': ['Введение в программирование'],
+        'courses_in_progress': ['PHP', 'Python', 'JavaScript'],
+        'grades': {'PHP': [6, 9, 10, 7, 9],  'Python': [7, 9, 9, 10, 7], 'JavaScript': [9, 8, 7, 10, 10]}
+    },
+]
+
+list_lecturer = [
+    {
+        'name': 'Oleg',
+        'surname': 'Buligin',
+        'gender': 'your_gender',
+        'courses_attached': ['PHP', 'Python', 'JavaScript'],
+        'lecture_grades': {'PHP': [6, 9, 10, 7, 9],  'Python': [7, 9, 9, 10, 7], 'JavaScript': [9, 8, 7, 10, 10]}
     },
     {
-        "name": "StudentFour",
-        "surname": "111",
-        "gender": "man",
-        "finished_courses": [],
-        "courses_in_progress": [],
-        "grades": {}
-    }
+        'name': 'Anatolii',
+        'surname': 'Vaserman',
+        'gender': 'your_gender',
+        'courses_attached': ['PHP', 'Python', 'JavaScript'],
+        'lecture_grades': {'PHP': [8, 9, 7, 10, 8],  'Python': [10, 5, 7, 10, 10], 'JavaScript': [8, 7, 10, 10, 6]}
+    },
+    {
+        'name': 'Vadim',
+        'surname': 'Degtiarev',
+        'gender': 'your_gender',
+        'courses_attached': ['PHP', 'Python', 'JavaScript'],
+        'lecture_grades': {'PHP': [6, 9, 8, 9, 8],  'Python': [8, 7, 10, 10, 5], 'JavaScript': [7, 8, 10, 10, 8]}
+    },
 ]
 
 
@@ -72,7 +88,7 @@ class Student:
         return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за домашние задания: {average_rating}\nКурсы в процессе изучения: {list_well}\nЗавершенные курсы: {list_well_end}"
 
     def rate_hw(self, lecturer, course, grade):
-        if isinstance(lecturer, Lecturer) and course in self.courses_in_progress and course in lecturer.lectures_attached:
+        if isinstance(lecturer, Lecturer) and course in self.courses_in_progress and course in lecturer.courses_attached:
             if course in lecturer.lecture_grades:
                 lecturer.lecture_grades[course] += [grade]
             else:
@@ -91,8 +107,6 @@ class Mentor:
 class Lecturer(Mentor):
     def __init__(self, name, surname):
         super().__init__(name, surname)
-        self.average_rating = 0
-        self.lectures_attached = []
         self.lecture_grades = {}
 
     def __str__(self):
@@ -104,7 +118,7 @@ class Lecturer(Mentor):
             num_rating = num_rating + len(item)
         self.average_rating = sum_rating / num_rating
 
-        return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {self.average_rating}"
+        return f"Имя: {self.name}\nФамилия: {self.surname}\Курсы: {self.courses_attached}\nСредняя оценка за лекции: {self.average_rating}"
 
     def __lt__(self, other):
         if not isinstance(other, Lecturer):
@@ -127,8 +141,38 @@ class Reviewer(Mentor):
         return f"Имя: {self.name}\nФамилия: {self.surname}"
 
 
-# def student_comparison(list_students, course_name):
+def student_comparison(list_stud, course):
+    total_score = []
+    sum_len_dic = 0
+    index = 0
+    for student in list_stud:
+        if course in student['grades']:
+            for key, item in student['grades'].items():
+                if key == course:
+                    total_score = total_score + item
+                    index += 1
+    sum_len_dic = sum(total_score) / len(total_score)
+    print(
+        f'Средней оценки за домашние задания по всем студентам в рамках курса "{course}" равна {sum_len_dic}.')
 
+
+def lecturer_comparison(list_lect, course):
+    total_score = []
+    sum_len_dic = 0
+    index = 0
+    for lectur in list_lect:
+        if course in lectur['lecture_grades']:
+            for key, item in lectur['lecture_grades'].items():
+                if key == course:
+                    total_score = total_score + item
+                    index += 1
+    sum_len_dic = sum(total_score) / len(total_score)
+    print(
+        f'Средней оценки за лекции всех лекторов в рамках курса "{course}" равна {sum_len_dic}.')
+
+
+student_comparison(list_students, "PHP")
+lecturer_comparison(list_lecturer, "Python")
 
 best_student = Student('Yuriy', 'Bonderenko', 'your_gender')
 best_student.courses_in_progress += ['Python']
@@ -149,12 +193,12 @@ cool_reviewer.courses_attached += ['Git']
 cool_reviewer.courses_attached += ['JavaScript']
 
 cool_lecturer = Lecturer('Anatoli', 'Vaserman')
-cool_lecturer.lectures_attached += ['Ruby']
-cool_lecturer.lectures_attached += ['Git']
+cool_lecturer.courses_attached += ['Ruby']
+cool_lecturer.courses_attached += ['Git']
 
 cool_2_lecturer = Lecturer('Oleg', 'Buligin')
-cool_2_lecturer.lectures_attached += ['JavaScript']
-cool_2_lecturer.lectures_attached += ['PHP']
+cool_2_lecturer.courses_attached += ['JavaScript']
+cool_2_lecturer.courses_attached += ['PHP']
 
 cool_reviewer.rate_hw(best_student, 'Python', 10)
 cool_reviewer.rate_hw(best_student, 'Git', 9)
@@ -169,15 +213,18 @@ best_student.rate_hw(cool_lecturer, 'Ruby', 10)
 best_student.rate_hw(cool_lecturer, 'Git', 8)
 
 best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 10)
-best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 8)
+best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 10)
 best_2_student.rate_hw(cool_2_lecturer, 'PHP', 9)
 
-print(best_student.grades)
-# print(cool_lecturer.lecture_grades)
+# print(best_student)
+# print(cool_lecturer)
+# print(cool_2_lecturer)
 
-print(best_2_student.grades)
+# print(list_students)
+
+# print(best_2_student.grades)
 # print(cool_2_lecturer.lecture_grades)
-print(cool_reviewer.__str__())
-print(cool_2_lecturer.__str__())
+# print(cool_lecturer.__str__())
+# print(cool_2_lecturer.__str__())
 # print(best_student.grades > best_2_student.grades)
-cool_lecturer.__lt__(cool_2_lecturer)
+# cool_lecturer.__lt__(cool_2_lecturer)
