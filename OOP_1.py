@@ -1,3 +1,39 @@
+list_students = [
+    {
+        "name": "StudentFour",
+        "surname": "111",
+        "gender": "man",
+        "finished_courses": [],
+        "courses_in_progress": [],
+        "grades": {}
+    },
+    {
+        "name": "StudentFour",
+        "surname": "111",
+        "gender": "man",
+        "finished_courses": [],
+        "courses_in_progress": [],
+        "grades": {}
+    },
+    {
+        "name": "StudentFour",
+        "surname": "111",
+        "gender": "man",
+        "finished_courses": [],
+        "courses_in_progress": [],
+        "grades": {}
+    },
+    {
+        "name": "StudentFour",
+        "surname": "111",
+        "gender": "man",
+        "finished_courses": [],
+        "courses_in_progress": [],
+        "grades": {}
+    }
+]
+
+
 class Student:
     def __init__(self, name, surname, gender):
         self.name = name
@@ -54,7 +90,8 @@ class Mentor:
 
 class Lecturer(Mentor):
     def __init__(self, name, surname):
-        Mentor.__init__(self, name, surname)
+        super().__init__(name, surname)
+        self.average_rating = 0
         self.lectures_attached = []
         self.lecture_grades = {}
 
@@ -65,9 +102,15 @@ class Lecturer(Mentor):
         for key, item in self.lecture_grades.items():
             sum_rating = sum_rating + sum(item)
             num_rating = num_rating + len(item)
-        average_rating = sum_rating / num_rating
+        self.average_rating = sum_rating / num_rating
 
-        return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {average_rating}"
+        return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {self.average_rating}"
+
+    def __lt__(self, other):
+        if not isinstance(other, Lecturer):
+            print("Not a lecture")
+            return
+        return print(self.average_rating < other.average_rating)
 
 
 class Reviewer(Mentor):
@@ -84,27 +127,57 @@ class Reviewer(Mentor):
         return f"Имя: {self.name}\nФамилия: {self.surname}"
 
 
-best_student = Student('Ruoy', 'Eman', 'your_gender')
+# def student_comparison(list_students, course_name):
+
+
+best_student = Student('Yuriy', 'Bonderenko', 'your_gender')
 best_student.courses_in_progress += ['Python']
 best_student.courses_in_progress += ['Ruby']
 best_student.courses_in_progress += ['Git']
 best_student.finished_courses += ['Введение в программирование']
 
+best_2_student = Student('Ruoy', 'Eman', 'your_gender')
+best_2_student.courses_in_progress += ['Python']
+best_2_student.courses_in_progress += ['JavaScript']
+best_2_student.courses_in_progress += ['Git']
+best_2_student.courses_in_progress += ['PHP']
+best_2_student.finished_courses += ['Введение в программирование']
+
 cool_reviewer = Reviewer('Some', 'Buddy')
 cool_reviewer.courses_attached += ['Python']
+cool_reviewer.courses_attached += ['Git']
+cool_reviewer.courses_attached += ['JavaScript']
 
 cool_lecturer = Lecturer('Anatoli', 'Vaserman')
 cool_lecturer.lectures_attached += ['Ruby']
 cool_lecturer.lectures_attached += ['Git']
 
+cool_2_lecturer = Lecturer('Oleg', 'Buligin')
+cool_2_lecturer.lectures_attached += ['JavaScript']
+cool_2_lecturer.lectures_attached += ['PHP']
+
 cool_reviewer.rate_hw(best_student, 'Python', 10)
-cool_reviewer.rate_hw(best_student, 'Python', 10)
-cool_reviewer.rate_hw(best_student, 'Ruby', 10)
+cool_reviewer.rate_hw(best_student, 'Git', 9)
+cool_reviewer.rate_hw(best_student, 'Ruby', 7)
+
+cool_reviewer.rate_hw(best_2_student, 'Python', 8)
+cool_reviewer.rate_hw(best_2_student, 'JavaScript', 9)
+cool_reviewer.rate_hw(best_2_student, 'PHP', 7)
 
 best_student.rate_hw(cool_lecturer, 'Ruby', 9)
-best_student.rate_hw(cool_lecturer, 'Ruby', 8)
+best_student.rate_hw(cool_lecturer, 'Ruby', 10)
 best_student.rate_hw(cool_lecturer, 'Git', 8)
 
-# print(best_student.grades)
+best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 10)
+best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 8)
+best_2_student.rate_hw(cool_2_lecturer, 'PHP', 9)
+
+print(best_student.grades)
 # print(cool_lecturer.lecture_grades)
+
+print(best_2_student.grades)
+# print(cool_2_lecturer.lecture_grades)
 print(cool_reviewer.__str__())
+print(cool_2_lecturer.__str__())
+# print(best_student.grades > best_2_student.grades)
+cool_lecturer.__lt__(cool_2_lecturer)
