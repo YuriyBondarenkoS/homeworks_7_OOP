@@ -1,3 +1,6 @@
+from operator import and_, truediv
+
+
 list_students = [
     {
         'name': 'Yuriy',
@@ -31,21 +34,21 @@ list_lecturer = [
         'surname': 'Buligin',
         'gender': 'your_gender',
         'courses_attached': ['PHP', 'Python', 'JavaScript'],
-        'lecture_grades': {'PHP': [6, 9, 10, 7, 9],  'Python': [7, 9, 9, 10, 7], 'JavaScript': [9, 8, 7, 10, 10]}
+        'grades': {'PHP': [6, 9, 10, 7, 9],  'Python': [7, 9, 9, 10, 10], 'JavaScript': [9, 8, 7, 10, 10]}
     },
     {
         'name': 'Anatolii',
         'surname': 'Vaserman',
         'gender': 'your_gender',
         'courses_attached': ['PHP', 'Python', 'JavaScript'],
-        'lecture_grades': {'PHP': [8, 9, 7, 10, 8],  'Python': [10, 5, 7, 10, 10], 'JavaScript': [8, 7, 10, 10, 6]}
+        'grades': {'PHP': [8, 9, 7, 10, 8],  'Python': [10, 9, 7, 10, 10], 'JavaScript': [8, 7, 10, 10, 6]}
     },
     {
         'name': 'Vadim',
         'surname': 'Degtiarev',
         'gender': 'your_gender',
         'courses_attached': ['PHP', 'Python', 'JavaScript'],
-        'lecture_grades': {'PHP': [6, 9, 8, 9, 8],  'Python': [8, 7, 10, 10, 5], 'JavaScript': [7, 8, 10, 10, 8]}
+        'grades': {'PHP': [6, 9, 8, 9, 8],  'Python': [8, 7, 10, 10, 9], 'JavaScript': [7, 8, 10, 10, 8]}
     },
 ]
 
@@ -68,7 +71,10 @@ class Student:
         for key, item in self.grades.items():
             sum_rating = sum_rating + sum(item)
             num_rating = num_rating + len(item)
-        average_rating = sum_rating / num_rating
+        if num_rating > 0:
+            average_rating = sum_rating / num_rating
+        else:
+            return f"Нет оценок для вывода среднего значения по домашнему заданию для {self.name} {self.surname}."
 
         i = 0
         while i < len(self.courses_in_progress):
@@ -88,11 +94,20 @@ class Student:
         return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за домашние задания: {average_rating}\nКурсы в процессе изучения: {list_well}\nЗавершенные курсы: {list_well_end}"
 
     def rate_hw(self, lecturer, course, grade):
-        if isinstance(lecturer, Lecturer) and course in self.courses_in_progress and course in lecturer.courses_attached:
-            if course in lecturer.lecture_grades:
-                lecturer.lecture_grades[course] += [grade]
+        try:
+            if grade == int(grade) and grade >= 0 and grade <= 10:
+                True
             else:
-                lecturer.lecture_grades[course] = [grade]
+                return print(
+                    f'Не верный ввод оценки "{grade}" за курс "{course}". Оценка должна быть целым числом от 0 до 10.')
+        except ValueError:
+            print(
+                f'Не верный ввод оценки "{grade}" за курс "{course}". Оценка должна быть целым числом от 0 до 10.')
+        if isinstance(lecturer, Lecturer) and course in self.courses_in_progress and course in lecturer.courses_attached:
+            if course in lecturer.grades:
+                lecturer.grades[course] += [grade]
+            else:
+                lecturer.grades[course] = [grade]
         else:
             return 'Ошибка'
 
@@ -107,13 +122,13 @@ class Mentor:
 class Lecturer(Mentor):
     def __init__(self, name, surname):
         super().__init__(name, surname)
-        self.lecture_grades = {}
+        self.grades = {}
 
     def __str__(self):
         sum_rating = 0
         num_rating = 0
 
-        for key, item in self.lecture_grades.items():
+        for key, item in self.grades.items():
             sum_rating = sum_rating + sum(item)
             num_rating = num_rating + len(item)
         self.average_rating = sum_rating / num_rating
@@ -129,6 +144,15 @@ class Lecturer(Mentor):
 
 class Reviewer(Mentor):
     def rate_hw(self, student, course, grade):
+        try:
+            if grade == int(grade) and grade >= 0 and grade <= 10:
+                True
+            else:
+                return print(
+                    f'Не верный ввод оценки "{grade}" за курс "{course}". Оценка должна быть целым числом от 0 до 10.')
+        except ValueError:
+            print(
+                f'Не верный ввод оценки "{grade}" за курс "{course}". Оценка должна быть целым числом от 0 до 10.')
         if isinstance(student, Student) and course in self.courses_attached and course in student.courses_in_progress:
             if course in student.grades:
                 student.grades[course] += [grade]
@@ -141,38 +165,27 @@ class Reviewer(Mentor):
         return f"Имя: {self.name}\nФамилия: {self.surname}"
 
 
-def student_comparison(list_stud, course):
+def all_comparison(list_people, course):
     total_score = []
     sum_len_dic = 0
     index = 0
-    for student in list_stud:
-        if course in student['grades']:
-            for key, item in student['grades'].items():
+    for elem in list_people:
+        if 'courses_attached' in elem:
+            text = "лекции всех лекторов"
+        else:
+            text = "домашние задания по всем студентам"
+        if course in elem['grades']:
+            for key, item in elem['grades'].items():
                 if key == course:
                     total_score = total_score + item
                     index += 1
-    sum_len_dic = sum(total_score) / len(total_score)
+    sum_len_dic = round(sum(total_score) / len(total_score), 2)
     print(
-        f'Средней оценки за домашние задания по всем студентам в рамках курса "{course}" равна {sum_len_dic}.')
+        f'Средняя оценка за {text} в рамках курса "{course}" равна {sum_len_dic} баллов.')
 
 
-def lecturer_comparison(list_lect, course):
-    total_score = []
-    sum_len_dic = 0
-    index = 0
-    for lectur in list_lect:
-        if course in lectur['lecture_grades']:
-            for key, item in lectur['lecture_grades'].items():
-                if key == course:
-                    total_score = total_score + item
-                    index += 1
-    sum_len_dic = sum(total_score) / len(total_score)
-    print(
-        f'Средней оценки за лекции всех лекторов в рамках курса "{course}" равна {sum_len_dic}.')
-
-
-student_comparison(list_students, "PHP")
-lecturer_comparison(list_lecturer, "Python")
+all_comparison(list_students, "Python")
+all_comparison(list_lecturer, "Python")
 
 best_student = Student('Yuriy', 'Bonderenko', 'your_gender')
 best_student.courses_in_progress += ['Python']
@@ -200,31 +213,34 @@ cool_2_lecturer = Lecturer('Oleg', 'Buligin')
 cool_2_lecturer.courses_attached += ['JavaScript']
 cool_2_lecturer.courses_attached += ['PHP']
 
-cool_reviewer.rate_hw(best_student, 'Python', 10)
-cool_reviewer.rate_hw(best_student, 'Git', 9)
-cool_reviewer.rate_hw(best_student, 'Ruby', 7)
+cool_reviewer.rate_hw(best_student, 'Python', 11)
+cool_reviewer.rate_hw(best_student, 'Git', 9.5)
+cool_reviewer.rate_hw(best_student, 'Ruby', 9)
 
 cool_reviewer.rate_hw(best_2_student, 'Python', 8)
 cool_reviewer.rate_hw(best_2_student, 'JavaScript', 9)
 cool_reviewer.rate_hw(best_2_student, 'PHP', 7)
 
-best_student.rate_hw(cool_lecturer, 'Ruby', 9)
-best_student.rate_hw(cool_lecturer, 'Ruby', 10)
+best_student.rate_hw(cool_lecturer, 'Ruby', 9.5)
+best_student.rate_hw(cool_lecturer, 'Ruby', 11)
 best_student.rate_hw(cool_lecturer, 'Git', 8)
 
-best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 10)
+best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 12)
 best_2_student.rate_hw(cool_2_lecturer, 'JavaScript', 10)
 best_2_student.rate_hw(cool_2_lecturer, 'PHP', 9)
 
 # print(best_student)
+
+# print(best_student.grades)
+# print(best_2_student.grades)
+
 # print(cool_lecturer)
 # print(cool_2_lecturer)
 
-# print(list_students)
+# print(cool_lecturer.grades)
 
-# print(best_2_student.grades)
-# print(cool_2_lecturer.lecture_grades)
+# print(cool_reviewer)
+
 # print(cool_lecturer.__str__())
 # print(cool_2_lecturer.__str__())
-# print(best_student.grades > best_2_student.grades)
 # cool_lecturer.__lt__(cool_2_lecturer)
